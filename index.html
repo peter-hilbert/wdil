@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WDIL</title>
+  <style>
+    body { font-family: sans-serif; max-width: 500px; margin: auto; padding: 2rem; }
+    label, input { display: block; margin-bottom: 0.5rem; }
+    input { padding: 0.5rem; font-size: 1rem; width: 100%; box-sizing: border-box; }
+    button { padding: 0.5rem 1rem; margin-top: 1rem; font-size: 1rem; }
+    #result { margin-top: 1rem; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>Workday Clock-Out Time Calculator</h2>
+
+  <label>Clock In:</label>
+  <input type="time" id="clockIn">
+
+  <label>Lunch Out:</label>
+  <input type="time" id="lunchOut">
+
+  <label>Lunch In:</label>
+  <input type="time" id="lunchIn">
+
+  <label>Hours to Work (e.g. 8 or 7.5):</label>
+  <input type="number" id="hoursToWork" step="0.1" min="0" placeholder="8">
+
+  <button onclick="calculate()">Calculate Clock-Out Time</button>
+
+  <div id="result"></div>
+
+  <script>
+    function parseTime(timeStr) {
+      const [hours, minutes] = timeStr.split(':').map(Number);
+      const date = new Date();
+      date.setHours(hours, minutes, 0, 0);
+      return date;
+    }
+
+    function formatTime(date) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function calculate() {
+      const clockIn = document.getElementById("clockIn").value;
+      const lunchOut = document.getElementById("lunchOut").value;
+      const lunchIn = document.getElementById("lunchIn").value;
+      const hoursToWork = parseFloat(document.getElementById("hoursToWork").value);
+
+      if (!clockIn || !lunchOut || !lunchIn || isNaN(hoursToWork)) {
+        document.getElementById("result").textContent = "Please fill in all fields.";
+        return;
+      }
+
+      const clockInTime = parseTime(clockIn);
+      const lunchOutTime = parseTime(lunchOut);
+      const lunchInTime = parseTime(lunchIn);
+
+      const workDurationMs = hoursToWork * 60 * 60 * 1000;
+      const lunchDurationMs = lunchInTime - lunchOutTime;
+
+      const clockOutTime = new Date(clockInTime.getTime() + workDurationMs + lunchDurationMs);
+      document.getElementById("result").textContent = "Clock out at: " + formatTime(clockOutTime);
+    }
+  </script>
+</body>
+</html>
